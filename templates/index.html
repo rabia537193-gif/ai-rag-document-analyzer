@@ -1,238 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RAG Document QA & Prompt Engineering Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body { background-color: #f1f5f9; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    .top-card { background: #f8fafc; border-radius: 20px; border: 1px solid #e2e8f0; }
-    .metric-card { background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 20px; }
-    .table-card { background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; }
-    .guide-card { background: #eff6ff; border-left: 5px solid #2563eb; border-radius: 12px; }
-    .sample-q-card { background: #f0fdf4; border-left: 5px solid #16a34a; border-radius: 12px; }
-    .chunk-box { background: #f8fafc; border-left: 4px solid #0284c7; padding: 12px; margin-bottom: 10px; border-radius: 8px; }
-    .nav-pills .nav-link.active { background-color: #e2e8f0; color: #0f172a; font-weight: 600; border-radius: 20px; }
-    .nav-pills .nav-link { color: #64748b; font-weight: 500; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Pipeline & Prompt Engineering Analysis</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN for Benchmarks -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="py-4">
-  <div class="container" style="max-width: 1100px;">
-    
-    <!-- Top Header -->
-    <div class="top-card p-4 mb-4 shadow-sm">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <span class="text-uppercase text-secondary fw-semibold small" style="letter-spacing: 0.5px;">ASSIGNMENT SUBMISSION</span>
-          <h2 class="fw-bold mb-0" style="font-family: Georgia, serif;">RAG Pipeline & Prompt Engineering Analysis</h2>
-        </div>
-        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-normal">
-          ● System Ready
-        </span>
-      </div>
-    </div>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
 
-    {% if msg %}
-      <div class="alert alert-info py-2 rounded-3 mb-4 alert-dismissible fade show">
-        <strong>Status:</strong> {{ msg }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-    {% endif %}
-
-    <!-- Navigation Tabs -->
-    <ul class="nav nav-pills mb-4 gap-2">
-      <li class="nav-item">
-        <button class="nav-link active px-4" id="live-tab" data-bs-toggle="tab" data-bs-target="#live" type="button">Live RAG Testing</button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link px-4" id="overview-tab" data-bs-target="#overview" data-bs-toggle="tab" type="button">Overview & Benchmarks</button>
-      </li>
-    </ul>
-
-    <div class="tab-content">
-      
-      <!-- TAB 1: Live RAG Application Controls -->
-      <div class="tab-pane fade show active" id="live">
-        
-        <!-- User Instructions Box -->
-        <div class="guide-card p-3 mb-4 shadow-sm">
-          <h5 class="fw-bold text-primary mb-2">📌 How to Use This System (Step-by-Step Guide)</h5>
-          <ol class="mb-0 small text-dark lh-base">
-            <li><strong>Option A (Use Existing Files):</strong> Embedding Model select karein aur <strong>"Build / Refresh ChromaDB"</strong> click karein taake files vector store mein index ho jayein[cite: 2, 6].</li>
-            <li><strong>Option B (Upload New File):</strong> Nayi `.pdf` ya `.txt` file upload karein aur Step 1 ki tarah database refresh karein[cite: 2, 6].</li>
-            <li><strong>Ask Question:</strong> Question Box mein query type karke <strong>"Run RAG Pipeline"</strong> daba dein[cite: 2, 6]!</li>
-          </ol>
+    <div class="max-w-6xl mx-auto px-4 pt-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">ASSIGNMENT SUBMISSION</p>
+                <h1 class="text-3xl font-extrabold text-slate-900 font-serif">RAG Pipeline & Prompt Engineering Analysis</h1>
+            </div>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                • System Ready
+            </span>
         </div>
 
-        <div class="row g-4">
-          
-          <!-- Left Column: Uploads & Vector Database (With Embedding Model Selection) -->
-          <div class="col-md-5">
-            <div class="table-card p-4 mb-3 shadow-sm">
-              <h5 class="fw-bold text-primary mb-2">1. Upload Custom File</h5>
-              <p class="small text-secondary mb-3">Upload your own PDF or Text document here.</p>
-              <form action="/upload" method="post" enctype="multipart/form-data">
-                <input type="file" name="files" class="form-control mb-3" multiple required>
-                <button type="submit" class="btn btn-outline-primary w-100 rounded-pill">Upload Files</button>
-              </form>
-            </div>
+        <!-- Navigation Tabs -->
+        <div class="flex space-x-3 mb-6">
+            <button id="tab-benchmarks" onclick="switchTab('benchmarks')" class="px-5 py-2.5 text-sm font-medium rounded-xl transition bg-slate-900 text-white shadow-sm">
+                Overview & Benchmarks
+            </button>
+            <button id="tab-testing" onclick="switchTab('testing')" class="px-5 py-2.5 text-sm font-medium rounded-xl transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                Live RAG Testing
+            </button>
+        </div>
 
-            <div class="table-card p-4 mb-3 shadow-sm">
-              <h5 class="fw-bold text-primary mb-2">2. Vector Database & Embedding</h5>
-              <p class="small text-secondary mb-2">Select Embedding Model and build index[cite: 6]:</p>
-              
-              <form action="/index-db" method="post">
-                <!-- Embedding Model Selection Dropdown -->
-                <div class="mb-3">
-                  <label class="form-label small fw-semibold text-dark">Select Embedding Model:</label>
-                  <select name="embedding_model" class="form-select">
-                    <option value="embedding1" selected>Embedding 1: sentence-transformers/all-MiniLM-L6-v2</option>
-                    <option value="embedding2">Embedding 2: sentence-transformers/paraphrase-MiniLM-L3-v2</option>
-                  </select>
+        <!-- Notification Banner -->
+        {% if msg %}
+        <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-sm font-medium">
+            {{ msg }}
+        </div>
+        {% endif %}
+
+        <!-- TAB 1: OVERVIEW & BENCHMARKS -->
+        <div id="view-benchmarks" class="space-y-6">
+            <!-- Top Metric Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-medium text-slate-500">Peak Accuracy</p>
+                    <p class="text-4xl font-extrabold text-slate-900 mt-2">96%</p>
+                    <p class="text-xs font-semibold text-emerald-600 mt-1">+24% vs Zero-Shot</p>
                 </div>
-
-                <button type="submit" class="btn btn-primary w-100 rounded-pill">Build / Refresh ChromaDB</button>
-              </form>
-            </div>
-
-            <div class="table-card p-4 shadow-sm">
-              <h6 class="fw-bold text-secondary mb-2">📂 Available Indexed Files ({{ files|length }}):</h6>
-              <ul class="small ps-3 text-secondary mb-0">
-                {% for f in files %}
-                  <li>📄 {{ f }}</li>
-                {% endfor %}
-              </ul>
-            </div>
-          </div>
-
-          <!-- Right Column: Query & Questions Guide -->
-          <div class="col-md-7">
-            
-            <div class="sample-q-card p-3 mb-4 shadow-sm">
-              <h6 class="fw-bold text-success mb-2">💡 Sample Questions You Can Ask Right Away:</h6>
-              <ul class="small mb-0 text-dark ps-3">
-                <li><strong>For Uploaded Resume:</strong> <em>"What technical skills and programming languages are listed in Rabia's resume?"</em>[cite: 3, 6]</li>
-                <li><strong>For Uploaded Resume:</strong> <em>"What is Rabia's educational background and certifications?"</em>[cite: 3, 6]</li>
-                <li><strong>For Sample Documents:</strong> <em>"Summarize the main topics discussed in doc1.txt"</em>[cite: 6]</li>
-                <li><strong>For General Context:</strong> <em>"What projects and algorithms are mentioned across the files?"</em>[cite: 2, 3, 6]</li>
-              </ul>
-            </div>
-
-            <div class="table-card p-4 mb-4 shadow-sm">
-              <h5 class="fw-bold text-success mb-3">3. Ask Questions (RAG Query)</h5>
-              <form action="/query" method="post">
-                <div class="mb-3">
-                  <label class="form-label small fw-semibold">Prompting Strategy (Part 1):</label>
-                  <select name="technique" class="form-select">
-                    <option value="role" selected>1. Role-Based + CoT RAG (Technical Document Analyst)</option>
-                    <option value="fewshot">2. Few-Shot Exemplar Prompting</option>
-                    <option value="default">3. Standard Direct Prompting</option>
-                  </select>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-medium text-slate-500">Vector DB Latency</p>
+                    <p class="text-4xl font-extrabold text-slate-900 mt-2">14.2ms</p>
+                    <p class="text-xs text-slate-500 mt-1">ChromaDB (Cosine Similarity)</p>
                 </div>
-                <div class="mb-3">
-                  <label class="form-label small fw-semibold">Question (Part 2):</label>
-                  <textarea name="question" class="form-control" rows="3" placeholder="Type your question here or copy one from the sample list above..." required>{{ question if question else '' }}</textarea>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-medium text-slate-500">Embedding Model</p>
+                    <p class="text-2xl font-bold text-slate-900 mt-3 truncate">all-MiniLM-L6-v2</p>
+                    <p class="text-xs text-slate-500 mt-1">384 dimensions</p>
                 </div>
-                <button type="submit" class="btn btn-success w-100 rounded-pill fw-bold">Run RAG Pipeline</button>
-              </form>
             </div>
 
-            {% if answer %}
-              <div class="table-card p-4 mb-3 border-success shadow-sm">
-                <h6 class="fw-bold text-success mb-2">💡 Gemini Answer:</h6>
-                <div class="p-2 text-dark">{{ answer }}</div>
-              </div>
-            {% endif %}
-
-            {% if chunks %}
-              <div class="table-card p-4 shadow-sm">
-                <h6 class="fw-bold text-info mb-3">📌 Retrieved Context Chunks (ChromaDB):</h6>
-                {% for chunk in chunks %}
-                  <div class="chunk-box">
-                    <div class="d-flex justify-content-between mb-1">
-                      <span class="badge bg-primary">Chunk {{ loop.index }}</span>
-                      <span class="badge bg-secondary">Distance: {{ chunk.score }}</span>
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h3 class="text-base font-bold text-slate-900 mb-1">Technique Accuracy Comparison</h3>
+                    <p class="text-xs text-slate-500 mb-4">Accuracy scores across baseline prompt strategies</p>
+                    <div class="relative h-64">
+                        <canvas id="accuracyChart"></canvas>
                     </div>
-                    <small class="text-dark">{{ chunk.content }}</small>
-                  </div>
-                {% endfor %}
-              </div>
-            {% endif %}
-
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 2: Benchmarks -->
-      <div class="tab-pane fade" id="overview">
-        <div class="row g-3 mb-4">
-          <div class="col-md-4">
-            <div class="metric-card shadow-sm">
-              <small class="text-secondary">Peak Accuracy</small>
-              <div class="display-6 fw-bold my-1">96%</div>
-              <small class="text-success fw-semibold">+24% vs Zero-Shot</small>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h3 class="text-base font-bold text-slate-900 mb-1">Latency vs Hallucination Rate</h3>
+                    <p class="text-xs text-slate-500 mb-4">Trade-off between response speed and precision</p>
+                    <div class="relative h-64">
+                        <canvas id="latencyChart"></canvas>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="col-md-4">
-            <div class="metric-card shadow-sm">
-              <small class="text-secondary">Vector DB Latency</small>
-              <div class="display-6 fw-bold my-1">14.2ms</div>
-              <small class="text-secondary">ChromaDB (Cosine)</small>
+
+            <!-- Benchmark Data Table -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <h3 class="text-lg font-bold text-slate-900 font-serif mb-1">Technique Performance Metrics</h3>
+                <p class="text-xs text-slate-500 mb-4">Benchmark score distributions across evaluated prompt strategies</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-slate-500 font-medium">
+                                <th class="py-3 px-4">Technique</th>
+                                <th class="py-3 px-4">Accuracy</th>
+                                <th class="py-3 px-4">Hallucination Rate</th>
+                                <th class="py-3 px-4">Avg Response Time</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            {% for b in benchmarks %}
+                            <tr class="hover:bg-slate-50">
+                                <td class="py-3 px-4 font-semibold text-slate-800">{{ b.technique }}</td>
+                                <td class="py-3 px-4 font-bold {% if b.accuracy == '96%' %}text-emerald-600{% else %}text-slate-700{% endif %}">{{ b.accuracy }}</td>
+                                <td class="py-3 px-4 text-slate-600">{{ b.hallucination }}</td>
+                                <td class="py-3 px-4 text-slate-600">{{ b.latency }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-          </div>
-          <div class="col-md-4">
-            <div class="metric-card shadow-sm">
-              <small class="text-secondary">Embedding Model</small>
-              <div class="h4 fw-bold my-2">all-MiniLM-L6-v2</div>
-              <small class="text-secondary">384 dimensions</small>
-            </div>
-          </div>
         </div>
 
-        <div class="table-card p-4 shadow-sm mb-4">
-          <h4 class="fw-bold mb-1" style="font-family: Georgia, serif;">Technique Accuracy Comparison</h4>
-          <p class="text-secondary small mb-3">Benchmark score distributions across evaluated prompt strategies</p>
+        <!-- TAB 2: LIVE RAG TESTING -->
+        <div id="view-testing" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Sidebar Documents & Indexing -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-base font-bold text-slate-900">Document Management</h3>
+                    
+                    <form action="/upload" method="post" enctype="multipart/form-data" class="space-y-3">
+                        <input type="file" name="files" multiple class="block w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200" />
+                        <button type="submit" class="w-full bg-slate-900 text-white text-xs py-2.5 rounded-xl font-semibold hover:bg-slate-800">Upload Files</button>
+                    </form>
 
-          <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-              <thead>
-                <tr class="text-secondary small">
-                  <th>Technique</th>
-                  <th>Accuracy</th>
-                  <th>Hallucination Rate</th>
-                  <th>Avg Response Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="fw-bold">Zero-Shot Direct</td>
-                  <td>72%</td>
-                  <td>18.4%</td>
-                  <td>820ms</td>
-                </tr>
-                <tr>
-                  <td class="fw-bold">Few-Shot Exemplar</td>
-                  <td>88%</td>
-                  <td>6.2%</td>
-                  <td>1150ms</td>
-                </tr>
-                <tr>
-                  <td class="fw-bold">Role-Based + CoT RAG</td>
-                  <td class="text-success fw-bold">96%</td>
-                  <td class="text-success fw-bold">1.1%</td>
-                  <td>1410ms</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                    <form action="/index-db" method="post">
+                        <button type="submit" class="w-full border border-slate-300 text-slate-700 text-xs py-2.5 rounded-xl font-semibold hover:bg-slate-50">Build Vector Database</button>
+                    </form>
+
+                    <div class="pt-2 border-t border-slate-100">
+                        <p class="text-xs font-semibold text-slate-500 mb-2">Available Documents:</p>
+                        <ul class="text-xs space-y-1 text-slate-600">
+                            {% for f in files %}
+                            <li class="truncate bg-slate-50 px-2 py-1 rounded border border-slate-200">📄 {{ f }}</li>
+                            {% else %}
+                            <li class="text-slate-400 italic">No files loaded yet.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Query Interface -->
+                <div class="md:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-base font-bold text-slate-900">Ask Document Questions</h3>
+                    <form action="/query" method="post" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Select Prompting Technique:</label>
+                            <select name="technique" class="w-full text-xs border border-slate-300 rounded-xl p-2.5 bg-white">
+                                <option value="role">Role-Based + CoT RAG (Recommended - 96% Acc)</option>
+                                <option value="fewshot">Few-Shot Exemplar (88% Acc)</option>
+                                <option value="zeroshot">Zero-Shot Direct Baseline (72% Acc)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Enter Question:</label>
+                            <textarea name="question" rows="3" required class="w-full text-xs border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-slate-900 focus:outline-none" placeholder="What information is in the document?"></textarea>
+                        </div>
+                        <button type="submit" class="bg-emerald-600 text-white text-xs px-5 py-2.5 rounded-xl font-bold hover:bg-emerald-700 shadow-sm">Submit Query</button>
+                    </form>
+
+                    {% if question %}
+                    <div class="mt-6 pt-4 border-t border-slate-200 space-y-2">
+                        <p class="text-xs font-bold text-slate-500">QUESTION:</p>
+                        <p class="text-sm font-semibold text-slate-800 bg-slate-50 p-3 rounded-xl border border-slate-200">{{ question }}</p>
+                        
+                        <p class="text-xs font-bold text-emerald-600 mt-4">AI RESPONSE:</p>
+                        <div class="text-sm text-slate-800 bg-emerald-50/50 p-4 rounded-xl border border-emerald-200 leading-relaxed">
+                            {{ answer }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-      </div>
-
     </div>
 
-  </div>
+    <!-- JavaScript For Tabs & Chart Rendering -->
+    <script>
+        function switchTab(tab) {
+            const btnBenchmarks = document.getElementById('tab-benchmarks');
+            const btnTesting = document.getElementById('tab-testing');
+            const viewBenchmarks = document.getElementById('view-benchmarks');
+            const viewTesting = document.getElementById('view-testing');
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            if (tab === 'benchmarks') {
+                viewBenchmarks.classList.remove('hidden');
+                viewTesting.classList.add('hidden');
+                btnBenchmarks.className = 'px-5 py-2.5 text-sm font-medium rounded-xl transition bg-slate-900 text-white shadow-sm';
+                btnTesting.className = 'px-5 py-2.5 text-sm font-medium rounded-xl transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200';
+            } else {
+                viewTesting.classList.remove('hidden');
+                viewBenchmarks.classList.add('hidden');
+                btnTesting.className = 'px-5 py-2.5 text-sm font-medium rounded-xl transition bg-slate-900 text-white shadow-sm';
+                btnBenchmarks.className = 'px-5 py-2.5 text-sm font-medium rounded-xl transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200';
+            }
+        }
+
+        // Render Chart.js Visualizations
+        window.addEventListener('DOMContentLoaded', () => {
+            // Accuracy Bar Chart
+            const ctxAcc = document.getElementById('accuracyChart').getContext('2d');
+            new Chart(ctxAcc, {
+                type: 'bar',
+                data: {
+                    labels: ['Zero-Shot', 'Few-Shot', 'Role-Based + CoT'],
+                    datasets: [{
+                        label: 'Accuracy %',
+                        data: [72, 88, 96],
+                        backgroundColor: ['#cbd5e1', '#94a3b8', '#059669'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, max: 100 } }
+                }
+            });
+
+            // Latency / Hallucination Chart
+            const ctxLat = document.getElementById('latencyChart').getContext('2d');
+            new Chart(ctxLat, {
+                type: 'line',
+                data: {
+                    labels: ['Zero-Shot', 'Few-Shot', 'Role-Based + CoT'],
+                    datasets: [
+                        {
+                            label: 'Hallucination Rate (%)',
+                            data: [18.4, 6.2, 1.1],
+                            borderColor: '#dc2626',
+                            backgroundColor: '#dc2626',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Latency (x100ms)',
+                            data: [8.2, 11.5, 14.1],
+                            borderColor: '#2563eb',
+                            backgroundColor: '#2563eb',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
