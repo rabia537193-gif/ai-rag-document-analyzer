@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAG Pipeline & Prompt Engineering Analysis</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN for Benchmarks -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
 
-    <div class="max-w-6xl mx-auto px-4 pt-8">
+    <div class="max-w-7xl mx-auto px-4 pt-8">
         <!-- Header -->
         <div class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
             <div>
@@ -33,7 +31,7 @@
             </button>
         </div>
 
-        <!-- Notification Banner -->
+        <!-- Message Notification -->
         {% if msg %}
         <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-sm font-medium">
             {{ msg }}
@@ -42,7 +40,7 @@
 
         <!-- TAB 1: OVERVIEW & BENCHMARKS -->
         <div id="view-benchmarks" class="space-y-6">
-            <!-- Top Metric Cards -->
+            <!-- Metric Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <p class="text-xs font-medium text-slate-500">Peak Accuracy</p>
@@ -52,12 +50,12 @@
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <p class="text-xs font-medium text-slate-500">Vector DB Latency</p>
                     <p class="text-4xl font-extrabold text-slate-900 mt-2">14.2ms</p>
-                    <p class="text-xs text-slate-500 mt-1">ChromaDB (Cosine Similarity)</p>
+                    <p class="text-xs text-slate-500 mt-1">ChromaDB (Cosine)</p>
                 </div>
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <p class="text-xs font-medium text-slate-500">Embedding Model</p>
-                    <p class="text-2xl font-bold text-slate-900 mt-3 truncate">all-MiniLM-L6-v2</p>
-                    <p class="text-xs text-slate-500 mt-1">384 dimensions</p>
+                    <p class="text-xs font-medium text-slate-500">Embedding Model Comparison</p>
+                    <p class="text-xl font-bold text-slate-900 mt-2">MiniLM-L6 vs BGE-Small</p>
+                    <p class="text-xs text-slate-500 mt-1">384 vs 384 dimensions</p>
                 </div>
             </div>
 
@@ -65,7 +63,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <h3 class="text-base font-bold text-slate-900 mb-1">Technique Accuracy Comparison</h3>
-                    <p class="text-xs text-slate-500 mb-4">Accuracy scores across baseline prompt strategies</p>
+                    <p class="text-xs text-slate-500 mb-4">Benchmark scores across evaluated prompt strategies</p>
                     <div class="relative h-64">
                         <canvas id="accuracyChart"></canvas>
                     </div>
@@ -79,9 +77,9 @@
                 </div>
             </div>
 
-            <!-- Benchmark Data Table -->
+            <!-- Table -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                <h3 class="text-lg font-bold text-slate-900 font-serif mb-1">Technique Performance Metrics</h3>
+                <h3 class="text-lg font-bold text-slate-900 font-serif mb-1">Technique Accuracy Comparison</h3>
                 <p class="text-xs text-slate-500 mb-4">Benchmark score distributions across evaluated prompt strategies</p>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -97,7 +95,7 @@
                             {% for b in benchmarks %}
                             <tr class="hover:bg-slate-50">
                                 <td class="py-3 px-4 font-semibold text-slate-800">{{ b.technique }}</td>
-                                <td class="py-3 px-4 font-bold {% if b.accuracy == '96%' %}text-emerald-600{% else %}text-slate-700{% endif %}">{{ b.accuracy }}</td>
+                                <td class="py-3 px-4 font-bold {% if '96%' in b.accuracy %}text-emerald-600{% else %}text-slate-700{% endif %}">{{ b.accuracy }}</td>
                                 <td class="py-3 px-4 text-slate-600">{{ b.hallucination }}</td>
                                 <td class="py-3 px-4 text-slate-600">{{ b.latency }}</td>
                             </tr>
@@ -110,141 +108,18 @@
 
         <!-- TAB 2: LIVE RAG TESTING -->
         <div id="view-testing" class="hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Sidebar Documents & Indexing -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                    <h3 class="text-base font-bold text-slate-900">Document Management</h3>
-                    
-                    <form action="/upload" method="post" enctype="multipart/form-data" class="space-y-3">
-                        <input type="file" name="files" multiple class="block w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200" />
-                        <button type="submit" class="w-full bg-slate-900 text-white text-xs py-2.5 rounded-xl font-semibold hover:bg-slate-800">Upload Files</button>
-                    </form>
-
-                    <form action="/index-db" method="post">
-                        <button type="submit" class="w-full border border-slate-300 text-slate-700 text-xs py-2.5 rounded-xl font-semibold hover:bg-slate-50">Build Vector Database</button>
-                    </form>
-
-                    <div class="pt-2 border-t border-slate-100">
-                        <p class="text-xs font-semibold text-slate-500 mb-2">Available Documents:</p>
-                        <ul class="text-xs space-y-1 text-slate-600">
-                            {% for f in files %}
-                            <li class="truncate bg-slate-50 px-2 py-1 rounded border border-slate-200">📄 {{ f }}</li>
-                            {% else %}
-                            <li class="text-slate-400 italic">No files loaded yet.</li>
-                            {% endfor %}
-                        </ul>
+            <!-- Pipeline Steps Overview (Doc 1 to Doc 5 Pipeline) -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-base font-bold text-slate-900 mb-3">RAG Execution Pipeline (Doc 1 - Doc 5 Process)</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 text-center text-xs">
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                        <span class="block font-bold text-slate-700 mb-1">Step 1</span>
+                        Doc Ingestion (PDF / Resume / TXT)
                     </div>
-                </div>
-
-                <!-- Query Interface -->
-                <div class="md:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                    <h3 class="text-base font-bold text-slate-900">Ask Document Questions</h3>
-                    <form action="/query" method="post" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Select Prompting Technique:</label>
-                            <select name="technique" class="w-full text-xs border border-slate-300 rounded-xl p-2.5 bg-white">
-                                <option value="role">Role-Based + CoT RAG (Recommended - 96% Acc)</option>
-                                <option value="fewshot">Few-Shot Exemplar (88% Acc)</option>
-                                <option value="zeroshot">Zero-Shot Direct Baseline (72% Acc)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Enter Question:</label>
-                            <textarea name="question" rows="3" required class="w-full text-xs border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-slate-900 focus:outline-none" placeholder="What information is in the document?"></textarea>
-                        </div>
-                        <button type="submit" class="bg-emerald-600 text-white text-xs px-5 py-2.5 rounded-xl font-bold hover:bg-emerald-700 shadow-sm">Submit Query</button>
-                    </form>
-
-                    {% if question %}
-                    <div class="mt-6 pt-4 border-t border-slate-200 space-y-2">
-                        <p class="text-xs font-bold text-slate-500">QUESTION:</p>
-                        <p class="text-sm font-semibold text-slate-800 bg-slate-50 p-3 rounded-xl border border-slate-200">{{ question }}</p>
-                        
-                        <p class="text-xs font-bold text-emerald-600 mt-4">AI RESPONSE:</p>
-                        <div class="text-sm text-slate-800 bg-emerald-50/50 p-4 rounded-xl border border-emerald-200 leading-relaxed">
-                            {{ answer }}
-                        </div>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                        <span class="block font-bold text-slate-700 mb-1">Step 2</span>
+                        Recursive Chunking (1000 Tokens)
                     </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript For Tabs & Chart Rendering -->
-    <script>
-        function switchTab(tab) {
-            const btnBenchmarks = document.getElementById('tab-benchmarks');
-            const btnTesting = document.getElementById('tab-testing');
-            const viewBenchmarks = document.getElementById('view-benchmarks');
-            const viewTesting = document.getElementById('view-testing');
-
-            if (tab === 'benchmarks') {
-                viewBenchmarks.classList.remove('hidden');
-                viewTesting.classList.add('hidden');
-                btnBenchmarks.className = 'px-5 py-2.5 text-sm font-medium rounded-xl transition bg-slate-900 text-white shadow-sm';
-                btnTesting.className = 'px-5 py-2.5 text-sm font-medium rounded-xl transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200';
-            } else {
-                viewTesting.classList.remove('hidden');
-                viewBenchmarks.classList.add('hidden');
-                btnTesting.className = 'px-5 py-2.5 text-sm font-medium rounded-xl transition bg-slate-900 text-white shadow-sm';
-                btnBenchmarks.className = 'px-5 py-2.5 text-sm font-medium rounded-xl transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200';
-            }
-        }
-
-        // Render Chart.js Visualizations
-        window.addEventListener('DOMContentLoaded', () => {
-            // Accuracy Bar Chart
-            const ctxAcc = document.getElementById('accuracyChart').getContext('2d');
-            new Chart(ctxAcc, {
-                type: 'bar',
-                data: {
-                    labels: ['Zero-Shot', 'Few-Shot', 'Role-Based + CoT'],
-                    datasets: [{
-                        label: 'Accuracy %',
-                        data: [72, 88, 96],
-                        backgroundColor: ['#cbd5e1', '#94a3b8', '#059669'],
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, max: 100 } }
-                }
-            });
-
-            // Latency / Hallucination Chart
-            const ctxLat = document.getElementById('latencyChart').getContext('2d');
-            new Chart(ctxLat, {
-                type: 'line',
-                data: {
-                    labels: ['Zero-Shot', 'Few-Shot', 'Role-Based + CoT'],
-                    datasets: [
-                        {
-                            label: 'Hallucination Rate (%)',
-                            data: [18.4, 6.2, 1.1],
-                            borderColor: '#dc2626',
-                            backgroundColor: '#dc2626',
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Latency (x100ms)',
-                            data: [8.2, 11.5, 14.1],
-                            borderColor: '#2563eb',
-                            backgroundColor: '#2563eb',
-                            tension: 0.3
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                        <span class="block font-bold text-slate-700 mb-1">Step 3</span>
+                        Vector Embed
