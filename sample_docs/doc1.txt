@@ -1,0 +1,4 @@
+Company Remote Work Policy:
+All employees working remotely must register their primary devices with the IT Department before December 1st.
+Employees must use two-factor authentication (2FA) when accessing company portals.
+Unregistered devices will be blocked from accessing internal systems automatically after the deadline.

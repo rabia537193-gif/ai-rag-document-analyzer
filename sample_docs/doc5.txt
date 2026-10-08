@@ -1,0 +1,5 @@
+IT Support & Security FAQs:
+Question: How do I reset my account password?
+Answer: Navigate to the self-service portal at portal.company.com and click 'Reset Password'.
+Question: What are IT support hours?
+Answer: IT Support is available Monday to Friday from 9:00 AM to 5:00 PM PKT.

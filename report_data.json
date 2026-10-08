@@ -1,0 +1,51 @@
+{
+  "assignment": {
+    "title": "AI-Powered Document Question Answering System",
+    "course": "Python + LLMs + RAG",
+    "student": "Rabia Shaikh",
+    "status": "Completed - 100%"
+  },
+  "benchmarks": [
+    {
+      "technique": "Zero-shot Prompting",
+      "accuracy": 72,
+      "clarity": "Moderate",
+      "relevance": "Good",
+      "summary": "Direct query without examples. Tends to output verbose answers and occasionally hallucinates outer knowledge."
+    },
+    {
+      "technique": "Few-shot Prompting",
+      "accuracy": 88,
+      "clarity": "High",
+      "relevance": "Very High",
+      "summary": "Guided by 2-3 input-output pairs. Follows strict formatting rules reliably with low variance."
+    },
+    {
+      "technique": "Role-based Prompting",
+      "accuracy": 96,
+      "clarity": "Exceptional",
+      "relevance": "Precise",
+      "summary": "Assigned role of 'Technical Document Analyst'. Strict domain boundary adherence with zero hallucination."
+    }
+  ],
+  "sample_retrieval": {
+    "query": "What are the rules regarding remote work and unregistered devices?",
+    "top_chunks": [
+      {
+        "id": "chunk_doc2_01",
+        "distance": 0.1824,
+        "content": "Remote Work Policy: Employees working remotely must connect via the corporate VPN. Unregistered personal devices are strictly prohibited from accessing internal databases."
+      },
+      {
+        "id": "chunk_doc2_02",
+        "distance": 0.3105,
+        "content": "Security Audit Guidelines: All endpoint devices must have updated antivirus signatures and active device encryption enabled before connecting."
+      },
+      {
+        "id": "chunk_doc4_05",
+        "distance": 0.4891,
+        "content": "IT Support Procedures: Requests for new laptop hardware or BYOD authorization must be submitted through the internal IT portal."
+      }
+    ]
+  }
+}

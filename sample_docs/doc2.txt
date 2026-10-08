@@ -1,0 +1,4 @@
+Technical Setup and Deployment Guidelines:
+The production server requires Python 3.10+ and a minimum of 4GB RAM.
+Environment variables such as API keys and database credentials must be loaded via .env files.
+Never hardcode sensitive credentials directly inside the codebase or commit them to public version control repositories.

@@ -1,0 +1,4 @@
+Project AI Knowledge Assistant Overview:
+The AI Knowledge Assistant uses Retrieval-Augmented Generation (RAG) to answer user questions based on custom documents.
+It utilizes sentence-transformer embeddings to convert document chunks into numerical vectors.
+These vectors are stored in ChromaDB to perform fast semantic similarity searches.
