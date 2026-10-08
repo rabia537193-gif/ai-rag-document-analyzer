@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAG Pipeline & Prompt Engineering Analysis</title>
+    <title>RAG Pipeline Analysis</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
 
@@ -14,7 +13,7 @@
         <div class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
             <div>
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">ASSIGNMENT SUBMISSION</p>
-                <h1 class="text-3xl font-extrabold text-slate-900 font-serif">RAG Pipeline & Prompt Engineering Analysis</h1>
+                <h1 class="text-3xl font-extrabold text-slate-900">RAG Pipeline & Prompt Engineering Analysis</h1>
             </div>
             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
                 • System Ready
@@ -23,15 +22,15 @@
 
         <!-- Navigation Tabs -->
         <div class="flex space-x-3 mb-6">
-            <button id="tab-benchmarks" onclick="switchTab('benchmarks')" class="px-5 py-2.5 text-sm font-medium rounded-xl transition bg-slate-900 text-white shadow-sm">
+            <button id="btn-benchmarks" type="button" onclick="switchTab('benchmarks')" class="px-5 py-2.5 text-sm font-bold rounded-xl transition bg-slate-900 text-white shadow-sm cursor-pointer">
                 Overview & Benchmarks
             </button>
-            <button id="tab-testing" onclick="switchTab('testing')" class="px-5 py-2.5 text-sm font-medium rounded-xl transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+            <button id="btn-testing" type="button" onclick="switchTab('testing')" class="px-5 py-2.5 text-sm font-bold rounded-xl transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer">
                 Live RAG Testing
             </button>
         </div>
 
-        <!-- Message Notification -->
+        <!-- System Notification Message -->
         {% if msg %}
         <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-sm font-medium">
             {{ msg }}
@@ -40,7 +39,6 @@
 
         <!-- TAB 1: OVERVIEW & BENCHMARKS -->
         <div id="view-benchmarks" class="space-y-6">
-            <!-- Metric Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <p class="text-xs font-medium text-slate-500">Peak Accuracy</p>
@@ -59,28 +57,10 @@
                 </div>
             </div>
 
-            <!-- Charts Section -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <h3 class="text-base font-bold text-slate-900 mb-1">Technique Accuracy Comparison</h3>
-                    <p class="text-xs text-slate-500 mb-4">Benchmark scores across evaluated prompt strategies</p>
-                    <div class="relative h-64">
-                        <canvas id="accuracyChart"></canvas>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <h3 class="text-base font-bold text-slate-900 mb-1">Latency vs Hallucination Rate</h3>
-                    <p class="text-xs text-slate-500 mb-4">Trade-off between response speed and precision</p>
-                    <div class="relative h-64">
-                        <canvas id="latencyChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Table -->
+            <!-- Benchmark Table -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                <h3 class="text-lg font-bold text-slate-900 font-serif mb-1">Technique Accuracy Comparison</h3>
-                <p class="text-xs text-slate-500 mb-4">Benchmark score distributions across evaluated prompt strategies</p>
+                <h3 class="text-lg font-bold text-slate-900 mb-1">Technique Performance Summary</h3>
+                <p class="text-xs text-slate-500 mb-4">Benchmark evaluations across prompt strategies</p>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
@@ -95,7 +75,7 @@
                             {% for b in benchmarks %}
                             <tr class="hover:bg-slate-50">
                                 <td class="py-3 px-4 font-semibold text-slate-800">{{ b.technique }}</td>
-                                <td class="py-3 px-4 font-bold {% if '96%' in b.accuracy %}text-emerald-600{% else %}text-slate-700{% endif %}">{{ b.accuracy }}</td>
+                                <td class="py-3 px-4 font-bold text-emerald-600">{{ b.accuracy }}</td>
                                 <td class="py-3 px-4 text-slate-600">{{ b.hallucination }}</td>
                                 <td class="py-3 px-4 text-slate-600">{{ b.latency }}</td>
                             </tr>
@@ -108,18 +88,145 @@
 
         <!-- TAB 2: LIVE RAG TESTING -->
         <div id="view-testing" class="hidden space-y-6">
-            <!-- Pipeline Steps Overview (Doc 1 to Doc 5 Pipeline) -->
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <h3 class="text-base font-bold text-slate-900 mb-3">RAG Execution Pipeline (Doc 1 - Doc 5 Process)</h3>
+                <h3 class="text-base font-bold text-slate-900 mb-3">RAG Execution Pipeline (Doc 1 to Doc 5)</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 text-center text-xs">
                     <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="block font-bold text-slate-700 mb-1">Step 1</span>
-                        Doc Ingestion (PDF / Resume / TXT)
+                        <span class="block font-bold text-slate-700 mb-1">Doc 1</span>
+                        Document Ingestion (PDF / Resume)
                     </div>
                     <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="block font-bold text-slate-700 mb-1">Step 2</span>
-                        Recursive Chunking (1000 Tokens)
+                        <span class="block font-bold text-slate-700 mb-1">Doc 2</span>
+                        Text Chunking (500 Tokens)
                     </div>
                     <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="block font-bold text-slate-700 mb-1">Step 3</span>
-                        Vector Embed
+                        <span class="block font-bold text-slate-700 mb-1">Doc 3</span>
+                        Vector Embeddings (MiniLM / BGE)
+                    </div>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                        <span class="block font-bold text-slate-700 mb-1">Doc 4</span>
+                        Similarity Indexing (ChromaDB)
+                    </div>
+                    <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                        <span class="block font-bold text-emerald-800 mb-1">Doc 5</span>
+                        Gemini LLM Contextual Answer
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Sidebar Document Management -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                    <h3 class="text-base font-bold text-slate-900">Document Management</h3>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Embedding Model:</label>
+                        <select class="w-full text-xs border border-slate-300 rounded-xl p-2.5 bg-white">
+                            <option>Embedding 1: sentence-transformers/all-MiniLM-L6-v2</option>
+                            <option>Embedding 2: BAAI/bge-small-en-v1.5</option>
+                        </select>
+                    </div>
+
+                    <!-- File Upload Form -->
+                    <form action="/upload" method="post" enctype="multipart/form-data" class="space-y-3 pt-2 border-t border-slate-100">
+                        <label class="block text-xs font-semibold text-slate-600">Upload Resume / Custom Docs:</label>
+                        <input type="file" name="files" multiple required class="block w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200" />
+                        <button type="submit" class="w-full bg-slate-900 text-white text-xs py-2.5 rounded-xl font-semibold hover:bg-slate-800 cursor-pointer">Upload Files</button>
+                    </form>
+
+                    <!-- Build Vector DB -->
+                    <form action="/index-db" method="post">
+                        <button type="submit" class="w-full border border-slate-300 text-slate-700 text-xs py-2.5 rounded-xl font-semibold hover:bg-slate-50 cursor-pointer">Build Vector Database</button>
+                    </form>
+
+                    <!-- Available Uploaded Files List -->
+                    <div class="pt-2 border-t border-slate-100">
+                        <p class="text-xs font-semibold text-slate-500 mb-2">Available Documents:</p>
+                        <ul class="text-xs space-y-1 text-slate-600 max-h-48 overflow-y-auto">
+                            {% for f in files %}
+                            <li class="truncate bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 font-medium text-slate-700">📄 {{ f }}</li>
+                            {% else %}
+                            <li class="text-slate-400 italic">No custom files uploaded yet.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Query Form -->
+                <div class="md:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-base font-bold text-slate-900">Ask Document Questions</h3>
+                    <form action="/query" method="post" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Select Prompting Technique:</label>
+                            <select name="technique" class="w-full text-xs border border-slate-300 rounded-xl p-2.5 bg-white">
+                                <option value="role">Role-Based + CoT RAG (Recommended - 96% Acc)</option>
+                                <option value="fewshot">Few-Shot Exemplar (88% Acc)</option>
+                                <option value="zeroshot">Zero-Shot Direct Baseline (72% Acc)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Enter Question:</label>
+                            <textarea name="question" rows="4" required class="w-full text-xs border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-slate-900 focus:outline-none" placeholder="Ask anything about the uploaded resume or documents..."></textarea>
+                        </div>
+                        <button type="submit" class="bg-emerald-600 text-white text-xs px-5 py-2.5 rounded-xl font-bold hover:bg-emerald-700 shadow-sm cursor-pointer">Submit Query</button>
+                    </form>
+
+                    {% if question %}
+                    <div class="mt-6 pt-4 border-t border-slate-200 space-y-3">
+                        <p class="text-xs font-bold text-slate-500">QUESTION:</p>
+                        <p class="text-sm font-semibold text-slate-800 bg-slate-50 p-3 rounded-xl border border-slate-200">{{ question }}</p>
+
+                        <!-- RETRIEVED CHUNKS LOOP SECTION -->
+                        {% if chunks %}
+                        <p class="text-xs font-bold text-indigo-600 mt-4">RETRIEVED VECTOR CHUNKS (Doc 2 / Doc 4):</p>
+                        <div class="space-y-2">
+                            {% for c in chunks %}
+                            <div class="text-xs text-indigo-900 bg-indigo-50/80 p-3 rounded-xl border border-indigo-200 font-mono shadow-sm">
+                                📑 {{ c }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <p class="text-xs font-bold text-emerald-600 mt-4">AI RESPONSE (Doc 5):</p>
+                        <div class="text-sm text-slate-800 bg-emerald-50/50 p-4 rounded-xl border border-emerald-200 leading-relaxed whitespace-pre-line">
+                            {{ answer }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Switching Script -->
+    <script>
+        function switchTab(tab) {
+            const benchView = document.getElementById('view-benchmarks');
+            const testView = document.getElementById('view-testing');
+            const btnBench = document.getElementById('btn-benchmarks');
+            const btnTest = document.getElementById('btn-testing');
+
+            if (tab === 'testing') {
+                benchView.classList.add('hidden');
+                testView.classList.remove('hidden');
+
+                btnTest.className = 'px-5 py-2.5 text-sm font-bold rounded-xl transition bg-slate-900 text-white shadow-sm cursor-pointer';
+                btnBench.className = 'px-5 py-2.5 text-sm font-bold rounded-xl transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer';
+            } else {
+                testView.classList.add('hidden');
+                benchView.classList.remove('hidden');
+
+                btnBench.className = 'px-5 py-2.5 text-sm font-bold rounded-xl transition bg-slate-900 text-white shadow-sm cursor-pointer';
+                btnTest.className = 'px-5 py-2.5 text-sm font-bold rounded-xl transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer';
+            }
+        }
+
+        window.onload = function() {
+            {% if msg or question %}
+            switchTab('testing');
+            {% endif %}
+        };
+    </script>
+</body>
+</html>
